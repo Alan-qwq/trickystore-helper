@@ -10,7 +10,7 @@ TRICKYADDONUPDATETARGETLIST_URL="https://raw.githubusercontent.com/KOWX712/Trick
 INTEGRITYBOX_MIRROR="https://raw.githubusercontent.com/MeowDump/MeowDump/refs/heads/main/NullVoid/OptimusPrime"
 
 # ========== 新增：版本与更新配置 ==========
-CURRENT_VERSION="1.0.0"
+CURRENT_VERSION="1.0.1"
 UPDATE_JSON_URL="https://raw.githubusercontent.com/Alan-qwq/trickystore-helper/main/update.json"
 SCRIPT_PATH=""
 # ==========================================
