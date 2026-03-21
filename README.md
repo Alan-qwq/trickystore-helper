@@ -1,8 +1,9 @@
-#TrickyStore 辅助脚本
+##TrickyStore 辅助脚本
 
 本脚本是一个TrickyStore模块的辅助shell脚本，支持获取有效Keybox文件、一键更新target.txt、以及配置prop属性隐藏脚本等，以帮助通过环境检测
 
 #功能特性
+
 1.Keybox更新
 支持从三个不同源下载并自动解码keybox.xml文件：
 （1）Yurikey 源
@@ -20,7 +21,9 @@
 （2）生成开机自启的prop属性修改脚本，屏蔽Bootloader解锁状态、修改导致环境泄露的相关属性
 （3）更新target.txt
 
+
 #运行要求
+
 已Root设备
 1.含有Busybox/toybox 环境
 2.支持curl或wget
