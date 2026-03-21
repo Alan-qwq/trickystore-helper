@@ -9,11 +9,9 @@ YURIKEY_URL="https://raw.githubusercontent.com/Yurii0307/yurikey/main/key"
 TRICKYADDONUPDATETARGETLIST_URL="https://raw.githubusercontent.com/KOWX712/Tricky-Addon-Update-Target-List/keybox/.extra"
 INTEGRITYBOX_MIRROR="https://raw.githubusercontent.com/MeowDump/MeowDump/refs/heads/main/NullVoid/OptimusPrime"
 
-# ========== 新增：版本与更新配置 ==========
-CURRENT_VERSION="1.0.1"
+CURRENT_VERSION="1.0.0"
 UPDATE_JSON_URL="https://raw.githubusercontent.com/Alan-qwq/trickystore-helper/main/update.json"
 SCRIPT_PATH=""
-# ==========================================
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -103,36 +101,30 @@ init_env() {
     mkdir -p "$TS_DIR"
 }
 
-# ========== 新增：获取脚本路径函数 ==========
 get_script_path() {
-    # 兼容安卓toybox与主流shell，获取当前脚本绝对路径
     if command -v readlink >/dev/null 2>&1; then
         SCRIPT_PATH=$(readlink -f "$0" 2>/dev/null)
     elif command -v toybox >/dev/null 2>&1; then
         SCRIPT_PATH=$(toybox readlink -f "$0" 2>/dev/null)
     fi
-    # 兜底方案
+    
     if [ -z "$SCRIPT_PATH" ] || [ ! -f "$SCRIPT_PATH" ]; then
         SCRIPT_PATH="$0"
     fi
-    # 校验写入权限
+    
     if [ ! -w "$SCRIPT_PATH" ]; then
         log_error "脚本文件无写入权限，无法执行更新操作"
         return 1
     fi
     return 0
 }
-# ==========================================
 
-# ========== 新增：检查更新核心函数 ==========
 check_update() {
     log_info "正在启动更新检查..."
-    # 前置校验：获取脚本路径
     if ! get_script_path; then
         return 1
     fi
 
-    # 下载更新配置文件
     local UPDATE_TMP="$TMP_DIR/update.json"
     log_info "正在拉取远程更新配置..."
     if ! download_file "$UPDATE_JSON_URL" "$UPDATE_TMP"; then
@@ -140,28 +132,23 @@ check_update() {
         return 1
     fi
 
-    # 无jq依赖，使用原生shell工具解析JSON字段
     log_info "正在解析更新信息..."
     local remote_version=$(grep -o '"version": *"[^"]*"' "$UPDATE_TMP" | sed 's/"version": *"//;s/"//g')
     local update_url=$(grep -o '"update_url": *"[^"]*"' "$UPDATE_TMP" | sed 's/"update_url": *"//;s/"//g')
     local update_log=$(grep -o '"update_log": *"[^"]*"' "$UPDATE_TMP" | sed 's/"update_log": *"//;s/"//g')
     local need_update=$(grep -o '"need_update": *[^,}]*' "$UPDATE_TMP" | sed 's/"need_update": *//;s/[ ,}]//g')
 
-    # 校验必填字段完整性
     if [ -z "$remote_version" ] || [ -z "$update_url" ]; then
         log_error "更新配置解析失败，核心字段缺失，请检查远程JSON文件格式"
         return 1
     fi
 
-    # 版本信息展示
     echo ""
     echo -e "${CYAN}当前版本:${NC} v$CURRENT_VERSION"
     echo -e "${CYAN}远程版本:${NC} v$remote_version"
     echo ""
 
-    # 判断是否需要更新
     local is_need_update=0
-    # 先判断强制更新标记，再对比语义化版本号
     if [ "$need_update" = "true" ]; then
         if [ "$(printf '%s\n%s' "$CURRENT_VERSION" "$remote_version" | sort -V | head -n1)" != "$remote_version" ]; then
             is_need_update=1
@@ -173,51 +160,44 @@ check_update() {
         return 0
     fi
 
-    # 发现新版本，展示更新详情
     echo -e "${YELLOW}===== 发现可用新版本 =====${NC}"
     echo -e "${CYAN}新版本号:${NC} v$remote_version"
     echo -e "${CYAN}更新内容:${NC} $update_log"
     echo -e "${YELLOW}==========================${NC}"
     echo ""
 
-    # 询问用户是否确认更新
     local update_confirm
-    echo -n "是否立即下载并更新到最新版本？[y/n] "
+    echo -n "是否立即更新到最新版本？[y/n] "
     read update_confirm
     case "$update_confirm" in
         [Yy]*)
             log_info "正在下载新版本安装包..."
             local NEW_SCRIPT_TMP="$TMP_DIR/new_tricky_helper.sh"
-            # 下载新版本脚本
             if ! download_file "$update_url" "$NEW_SCRIPT_TMP"; then
                 log_error "新版本脚本下载失败，更新已终止"
                 return 1
             fi
 
-            # 校验下载文件有效性
             if [ ! -s "$NEW_SCRIPT_TMP" ]; then
                 log_error "下载的新版本文件为空，更新已终止"
                 return 1
             fi
 
-            # 替换原脚本文件
             log_info "正在替换脚本文件..."
             if ! cp -f "$NEW_SCRIPT_TMP" "$SCRIPT_PATH"; then
                 log_error "脚本文件替换失败，请检查目录权限"
                 return 1
             fi
 
-            # 赋予执行权限
             chmod 755 "$SCRIPT_PATH"
             if [ $? -ne 0 ]; then
-                log_warn "脚本执行权限设置失败，若后续运行异常请手动赋予755权限"
+                log_warn "脚本执行权限设置失败"
             fi
 
-            # 更新完成，重启脚本
-            log_info "✅ 脚本更新成功！2秒后将自动重启新版本..."
-            sleep 2
-            # 用新脚本替换当前进程，实现无缝重启
-            exec "$SCRIPT_PATH"
+            # 此处为修改内容：移除自动重启逻辑，改为提示后终止脚本
+            log_info "✅ 脚本更新成功！"
+            echo "脚本更新完毕，请重新执行脚本"
+            sleep 1
             exit 0
             ;;
         *)
@@ -226,7 +206,6 @@ check_update() {
             ;;
     esac
 }
-# ==========================================
 
 fetch_yurikey() {
     log_info "[1/2] 正在下载 Yurikey 源..."
@@ -522,9 +501,7 @@ by 酷安 ALAN_233${NC}"
         echo -e "${CYAN}[5]${NC} 一键更新 target.txt"
         echo -e "${PURPLE}[6]${NC} 一键配置 TrickyStore"
         echo -e "${BLUE}[7]${NC} 查看作者酷安"
-        # ========== 新增：菜单选项8 ==========
         echo -e "${BLUE}[8]${NC} 检查更新"
-        # ======================================
         echo -e "${RED}[0]${NC} 退出"
         echo -n "请选择: "
         read choice
@@ -557,9 +534,7 @@ by 酷安 ALAN_233${NC}"
                 esac
             ;;
             7) log_info "正在跳转作者酷安主页..." && am start -a android.intent.action.VIEW -d "https://www.coolapk.com/u/38346436" 2>/dev/null || log_error "跳转失败，请手动访问：https://www.coolapk.com/u/38346436" ;;
-            # ========== 新增：选项8执行分支 ==========
             8) check_update ;;
-            # ======================================
             0) exit 0 ;;
             *) echo "无效选项" ;;
         esac
