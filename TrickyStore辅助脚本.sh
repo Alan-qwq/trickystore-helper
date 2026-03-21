@@ -304,7 +304,6 @@ show_current() {
     fi
 }
 
-# 密钥管理子菜单（整合更新+查看状态）
 keybox_manage_menu() {
     while true; do
         clear
