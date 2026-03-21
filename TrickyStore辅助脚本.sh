@@ -120,6 +120,7 @@ get_script_path() {
 }
 
 check_update() {
+    clear
     log_info "正在启动更新检查..."
     if ! get_script_path; then
         return 1
@@ -341,7 +342,7 @@ update_target_txt() {
 
     local packages=$(printf "%s\n" "$pkg_third" "$pkg_system" | sort -u | grep -v '^$')
     if [ -z "$packages" ]; then
-        log_error "未获取到用户应用包名"
+        log_error "未获取到任何非系统应用包名"
         sleep 2
         return 1
     fi
