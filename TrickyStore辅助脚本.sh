@@ -121,7 +121,8 @@ get_script_path() {
 
 check_update() {
     clear
-    log_info "正在启动更新检查..."
+    sleep 1
+    log_info "正在检查更新..."
     if ! get_script_path; then
         return 1
     fi
@@ -140,13 +141,13 @@ check_update() {
     local need_update=$(grep -o '"need_update": *[^,}]*' "$UPDATE_TMP" | sed 's/"need_update": *//;s/[ ,}]//g')
 
     if [ -z "$remote_version" ] || [ -z "$update_url" ]; then
-        log_error "更新配置解析失败，核心字段缺失，请检查远程JSON文件格式"
+        log_error "更新配置解析失败"
         return 1
     fi
 
     echo ""
     echo -e "${CYAN}当前版本:${NC} v$CURRENT_VERSION"
-    echo -e "${CYAN}远程版本:${NC} v$remote_version"
+    echo -e "${CYAN}最新版本:${NC} v$remote_version"
     echo ""
 
     local is_need_update=0
