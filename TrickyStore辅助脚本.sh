@@ -341,7 +341,7 @@ update_target_txt() {
 
     local packages=$(printf "%s\n" "$pkg_third" "$pkg_system" | sort -u | grep -v '^$')
     if [ -z "$packages" ]; then
-        log_error "未获取到任何非系统应用包名"
+        log_error "未获取到用户应用包名"
         sleep 2
         return 1
     fi
