@@ -307,7 +307,7 @@ show_current() {
 keybox_manage_menu() {
     while true; do
         clear
-        echo -e "${PURPLE}=== 选择keybox源 ===${NC}"
+        echo -e "${PURPLE}选择keybox源${NC}"
         echo -e "${GREEN}[1]${NC} Yurikey 源"
         echo -e "${GREEN}[2]${NC} Tricky-Addon-Update-Target-List 源"
         echo -e "${GREEN}[3]${NC} IntegrityBox 源"
@@ -342,7 +342,7 @@ update_target_txt() {
         echo -e "${GREEN}[1]${NC} 正常模式"
         echo -e "${YELLOW}[2]${NC} 生成证书链（!）"
         echo -e "${YELLOW}[3]${NC} 修改证书链（?）"
-        echo -e "${RED}[0]${NC} 跳过配置"
+        echo -e "${RED}[0]${NC} 退出"
         echo -n "请选择模式: "
         read mode_choice
         case "$mode_choice" in
@@ -538,7 +538,7 @@ by 酷安 ALAN_233${NC}"
                 clear
                 echo -e "${YELLOW}【操作确认】${NC}"
                 echo -e "本操作用于配置TrickyStore和完成部分环境隐藏
-使用本脚本无需安装任何TrickyStore的辅助模块（如Tricky-Addon-Update-Target-List等）
+使用本脚本无需安装任何TrickyStore的辅助模块（如Tricky-Addon-Update-Target-List等），否则可能导致冲突
 重启即可完成隐藏"
                 echo -e "此操作将执行以下3个步骤："
                 echo -e "1. 配置/data/adb/tricky_store/system_app"
