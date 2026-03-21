@@ -196,7 +196,6 @@ check_update() {
                 log_warn "脚本执行权限设置失败"
             fi
 
-            # 此处为修改内容：移除自动重启逻辑，改为提示后终止脚本
             log_info "✅ 脚本更新成功！"
             echo "脚本更新完毕，请重新执行脚本"
             sleep 1
@@ -303,6 +302,34 @@ show_current() {
     else
         echo -e "${YELLOW}未找到 Keybox 文件${NC}"
     fi
+}
+
+# 密钥管理子菜单（整合更新+查看状态）
+keybox_manage_menu() {
+    while true; do
+        clear
+        echo -e "${PURPLE}=== 选择keybox源 ===${NC}"
+        echo -e "${GREEN}[1]${NC} Yurikey 源"
+        echo -e "${GREEN}[2]${NC} Tricky-Addon-Update-Target-List 源"
+        echo -e "${GREEN}[3]${NC} IntegrityBox 源"
+        echo -e "${CYAN}[4]${NC} 查看当前Keybox状态"
+        echo -e "${RED}[0]${NC} 返回主菜单"
+        echo -n "请选择: "
+        read sub_choice
+
+        case "$sub_choice" in
+            1) fetch_yurikey && validate_keybox "$TMP_KEYBOX" && install_keybox ;;
+            2) fetch_tricky_addon && validate_keybox "$TMP_KEYBOX" && install_keybox ;;
+            3) fetch_integritybox && validate_keybox "$TMP_KEYBOX" && install_keybox ;;
+            4) show_current ;;
+            0) return 0 ;;
+            *) echo "无效选项" ;;
+        esac
+
+        echo ""
+        echo -n "按回车继续..."
+        read dummy
+    done
 }
 
 update_target_txt() {
@@ -496,25 +523,19 @@ main() {
         clear
         echo -e "${PURPLE}TrickyStore辅助脚本 v1.0.0 20260321
 by 酷安 ALAN_233${NC}"
-        echo -e "${GREEN}[1]${NC} Yurikey 源"
-        echo -e "${GREEN}[2]${NC} Tricky-Addon-Update-Target-List 源"
-        echo -e "${GREEN}[3]${NC} IntegrityBox 源"
-        echo -e "${YELLOW}[4]${NC} 查看当前状态"
-        echo -e "${CYAN}[5]${NC} 一键更新 target.txt"
-        echo -e "${PURPLE}[6]${NC} 一键配置 TrickyStore"
-        echo -e "${BLUE}[7]${NC} 查看作者酷安"
-        echo -e "${BLUE}[8]${NC} 检查更新"
+        echo -e "${GREEN}[1]${NC} 一键更新有效密钥"
+        echo -e "${CYAN}[2]${NC} 一键更新 target.txt"
+        echo -e "${PURPLE}[3]${NC} 一键配置 TrickyStore"
+        echo -e "${BLUE}[4]${NC} 查看作者酷安"
+        echo -e "${BLUE}[5]${NC} 检查更新"
         echo -e "${RED}[0]${NC} 退出"
         echo -n "请选择: "
         read choice
 
         case "$choice" in
-            1) fetch_yurikey && validate_keybox "$TMP_KEYBOX" && install_keybox ;;
-            2) fetch_tricky_addon && validate_keybox "$TMP_KEYBOX" && install_keybox ;;
-            3) fetch_integritybox && validate_keybox "$TMP_KEYBOX" && install_keybox ;;
-            4) show_current ;;
-            5) update_target_txt ;;
-            6) 
+            1) keybox_manage_menu ;;
+            2) update_target_txt ;;
+            3) 
                 clear
                 echo -e "${YELLOW}【操作确认】${NC}"
                 echo -e "本操作用于配置TrickyStore和完成部分环境隐藏
@@ -535,11 +556,12 @@ by 酷安 ALAN_233${NC}"
                         ;;
                 esac
             ;;
-            7) log_info "正在跳转作者酷安主页..." && am start -a android.intent.action.VIEW -d "https://www.coolapk.com/u/38346436" 2>/dev/null || log_error "跳转失败，请手动访问：https://www.coolapk.com/u/38346436" ;;
-            8) check_update ;;
+            4) log_info "正在跳转作者酷安主页..." && am start -a android.intent.action.VIEW -d "https://www.coolapk.com/u/38346436" 2>/dev/null || log_error "跳转失败，请手动访问：https://www.coolapk.com/u/38346436" ;;
+            5) check_update ;;
             0) exit 0 ;;
             *) echo "无效选项" ;;
         esac
+
         echo ""
         echo -n "按回车继续..."
         read dummy
