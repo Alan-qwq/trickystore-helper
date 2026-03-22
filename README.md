@@ -16,15 +16,8 @@
 3.一键配置TrickyStore
 安装TrickyStore后运行本脚本
 无需安装任何其他的TrickyStore辅助模块
-自动完成以下三项核心配置：
-（1）配置/data/adb/tricky_store/system_app
-（2）生成开机自启的prop属性修改脚本，屏蔽Bootloader解锁状态、修改导致环境泄露的相关属性
-（3）更新target.txt
+自动完成以下配置：
+（1）生成开机自启的prop属性修改脚本，隐藏导致环境泄露的相关属性
+（2）更新target.txt
 
-
-#运行要求
-
-已Root设备
-1.含有Busybox/toybox 环境
-2.支持curl或wget
-3.已正确安装TrickyStore模块
+借鉴和使用了Tricky Addon-Update Target List的代码
